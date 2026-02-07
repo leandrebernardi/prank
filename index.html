@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>System Scan</title>
+
+</head>
+
+<body>
+
+<div id="main">
+<h1>🦠 SYSTEM SECURITY SCAN</h1>
+
+<div class="box">
+  <p id="status">Initializing scan...</p>
+
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <p id="warning" class="red"></p>
+  <p id="files"></p>
+  <p id="panic"></p>
+</div>
+</div>
+
+<div id="blueScreen">
+  <h1>😵 Your PC ran into a problem</h1>
+  <p>Collecting error information...</p>
+  <p id="countdown"></p>
+</div>
+
+<script>
+
+let bar = document.getElementById("bar");
+let statusText = document.getElementById("status");
+let warning = document.getElementById("warning");
+let filesText = document.getElementById("files");
+let panicText = document.getElementById("panic");
+let blue = document.getElementById("blueScreen");
+let main = document.getElementById("main");
+
+let channelLink = "http://www.youtube.com/@DataIn60Sec";
+
+let viruses = [
+  "Trojan.X99",
+  "DataEater.exe",
+  "ExcelDestroyer 😈",
+  "MemoryLeech",
+  "PivotBreaker"
+];
+
+let progress = 0;
+let deletedFiles = 0;
+let panic = 0;
+
+let scan = setInterval(() => {
+
+  progress += Math.floor(Math.random() * 6) + 2;
+  if (progress > 100) progress = 100;
+
+  bar.style.width = progress + "%";
+  statusText.innerHTML = "Scanning system files... " + progress + "%";
+
+  if (progress > 35 && progress < 60) {
+    warning.innerHTML = "⚠️ Threat detected: " +
+      viruses[Math.floor(Math.random() * viruses.length)];
+    document.body.style.background =
+      progress % 2 === 0 ? "#200" : "black";
+    panic += 2;
+  }
+
+  if (progress >= 60 && progress < 90) {
+    statusText.innerHTML = "Deleting infected files...";
+    deletedFiles += Math.floor(Math.random() * 5) + 1;
+    filesText.innerHTML = "🗑 Files deleted: " + deletedFiles;
+    panic += 3;
+  }
+
+  panicText.innerHTML = "😱 Panic level: " + panic + "%";
+
+  if (progress >= 100) {
+    clearInterval(scan);
+    warning.innerHTML = "🚨 SYSTEM FAILURE!";
+    statusText.innerHTML = "Critical error detected...";
+    setTimeout(showBlueScreen, 1500);
+  }
+
+}, 200);
+
+function showBlueScreen() {
+  main.style.display = "none";
+  blue.style.display = "block";
+
+  let time = 5;
+  document.getElementById("countdown").innerHTML =
+    "Restarting in " + time + " seconds...";
+
+  let timer = setInterval(() => {
+    time--;
+    document.getElementById("countdown").innerHTML =
+      "Restarting in " + time + " seconds...";
+
+    if (time === 0) {
+      clearInterval(timer);
+      prankReveal();
+    }
+  }, 1000);
+}
+
+function prankReveal() {
+  alert(
+    "😂 GOT YOU!\n\nFake virus prank 😈\n\nComment:\n'I PANICKED 😱'\n\nRedirecting you..."
+  );
+
+  setTimeout(() => {
+    window.location.href = channelLink;
+  }, 1500);
+}
+
+</script>
+
+</body>
+</html>
