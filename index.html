@@ -34,9 +34,13 @@
     </div>
 
     <div id="scene-virus" class="scene">
-        <h2>VIRUS INJECTÉ...</h2>
-        <p style="font-size: 30px;">Extraction des mots de passe : 88%</p>
-        <p style="font-size: 20px; color: #555;">IP: 192.168.1.104 | Uploading to server...</p>
+        <h2 id="virus-status">EXTRACTION DES DONNÉES...</h2>
+    <div style="font-size: 50px; color: #ff0000; margin: 20px 0;" id="main-percent">0%</div>
+        
+    <div id="pass-console" style="font-family: monospace; font-size: 18px; color: #0f0; height: 200px; overflow: hidden; width: 80%; border: 1px solid #333; padding: 10px; background: rgba(0,20,0,0.5);">
+    </div>
+        
+        <p style="margin-top: 20px; color: #555;">Target: LocalHost/Users/Admin/Documents</p>
     </div>
 
     <div id="scene-bsod" class="scene">
@@ -50,50 +54,45 @@
     <div id="scene-black" class="scene"></div>
 
     <script>
-        // --- RÉGLAGES DES DURÉES (en millisecondes) ---
-        const TEMPS_VIRUS = 5000; // 5 secondes de texte vert
-        const TEMPS_BSOD  = 8000; // 8 secondes d'écran bleu
+    const TEMPS_VIRUS = 10000; // 10 secondes pour tout voler
+    const TEMPS_BSOD  = 8000; 
 
-        const start = document.getElementById('start-screen');
-        const s1 = document.getElementById('scene-virus');
-        const s2 = document.getElementById('scene-bsod');
-        const s3 = document.getElementById('scene-black');
-        const prog = document.getElementById('progress');
+    const start = document.getElementById('start-screen');
+    const s1 = document.getElementById('scene-virus');
+    const s2 = document.getElementById('scene-bsod');
+    const s3 = document.getElementById('scene-black');
+    const mainPercent = document.getElementById('main-percent');
+    const passConsole = document.getElementById('pass-console');
 
-        // Lancement au clic
-        start.addEventListener('click', () => {
-            start.style.display = 'none';
-            s1.style.display = 'flex'; // Affiche le virus
+    start.addEventListener('click', () => {
+        start.style.display = 'none';
+        s1.style.display = 'flex';
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+
+        // --- LOGIQUE DE L'EXTRACTION ---
+        let p = 0;
+        let pInterval = setInterval(() => {
+            p++;
+            mainPercent.innerText = p + "%";
             
-            // Plein écran automatique
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+            // Ajouter un faux mot de passe à chaque %
+            const fakePass = "CRACKED: hash_" + Math.random().toString(36).substring(2, 15) + " -> [OK]";
+            const line = document.createElement('div');
+            line.innerText = fakePass;
+            passConsole.prepend(line); // Ajoute en haut de la liste
 
-            // Vers l'écran bleu
-            setTimeout(() => {
-                s1.style.display = 'none';
-                s2.style.display = 'flex';
-                
-                // Simulation du pourcentage
-                let p = 0;
-                let interval = setInterval(() => {
-                    p += Math.floor(Math.random() * 10);
-                    if (p > 100) p = 100;
-                    prog.innerText = p + "% complete";
-                    if (p >= 100) clearInterval(interval);
-                }, 500);
+            if (p >= 100) {
+                clearInterval(pInterval);
+                mainPercent.innerText = "100% - TOUT EXTRAIT";
+                mainPercent.style.color = "#0f0";
+            }
+        }, TEMPS_VIRUS / 100); // Répartit sur la durée totale
 
-            }, TEMPS_VIRUS);
-
-            // Vers l'écran noir final
-            setTimeout(() => {
-                s2.style.display = 'none';
-                s3.style.display = 'flex';
-                document.body.style.cursor = 'none'; // Cache la souris
-            }, TEMPS_VIRUS + TEMPS_BSOD);
-        });
-
-        // Anti clic droit
-        document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-</body>
-</html>
+        // Passage au BSOD après le délai
+        setTimeout(() => {
+            s1.style.display = 'none';
+            s2.style.display = 'flex';
+            // (Ici tu gardes ta logique de BSOD précédente...)
+        }, TEMPS_VIRUS);
+    });
+</script>
