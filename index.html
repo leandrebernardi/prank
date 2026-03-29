@@ -1,123 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<title>System Scan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chargement en cours...</title>
+    <style>
+        /* Supprime les marges et empêche le scroll */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            cursor: default;
+        }
 
+        /* La vidéo prend tout l'espace disponible sans déformation */
+        video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            pointer-events: none; /* Empêche l'utilisateur de cliquer sur pause */
+        }
+
+        /* Message invisible au centre pour forcer l'interaction si besoin */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="main">
-<h1>🦠 SYSTEM SECURITY SCAN</h1>
+    <div id="overlay"></div>
 
-<div class="box">
-  <p id="status">Initializing scan...</p>
+    <video id="prankVideo" loop playsinline>
+        <source src="votre-video.mp4" type="video/mp4">
+        Ton navigateur ne supporte pas la vidéo.
+    </video>
 
-  <div class="progress">
-    <div class="bar" id="bar"></div>
-  </div>
+    <script>
+        const video = document.getElementById('prankVideo');
+        const overlay = document.getElementById('overlay');
 
-  <p id="warning" class="red"></p>
-  <p id="files"></p>
-  <p id="panic"></p>
-</div>
-</div>
+        // 1. Démarrage de la vidéo et Plein Écran au premier clic
+        overlay.addEventListener('click', () => {
+            video.play();
+            overlay.style.display = 'none'; // On cache l'overlay une fois cliqué
+            
+            // Tentative de plein écran
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            }
+        });
 
-<div id="blueScreen">
-  <h1>😵 Your PC ran into a problem</h1>
-  <p>Collecting error information...</p>
-  <p id="countdown"></p>
-</div>
+        // 2. Blocage du menu contextuel (clic droit)
+        document.addEventListener('contextmenu', e => e.preventDefault());
 
-<script>
+        // 3. Empêcher la mise en pause (si l'utilisateur trouve une astuce)
+        video.onpause = () => video.play();
 
-let bar = document.getElementById("bar");
-let statusText = document.getElementById("status");
-let warning = document.getElementById("warning");
-let filesText = document.getElementById("files");
-let panicText = document.getElementById("panic");
-let blue = document.getElementById("blueScreen");
-let main = document.getElementById("main");
+        // 4. Titre de l'onglet dynamique (Psychologique)
+        let titles = ["⚠️ ERREUR SYSTÈME", "Chargement 99%...", "Ne pas fermer !"];
+        let i = 0;
+        setInterval(() => {
+            document.title = titles[i % titles.length];
+            i++;
+        }, 1000);
 
-let channelLink = "http://www.youtube.com/@DataIn60Sec";
-
-let viruses = [
-  "Trojan.X99",
-  "DataEater.exe",
-  "ExcelDestroyer 😈",
-  "MemoryLeech",
-  "PivotBreaker"
-];
-
-let progress = 0;
-let deletedFiles = 0;
-let panic = 0;
-
-let scan = setInterval(() => {
-
-  progress += Math.floor(Math.random() * 6) + 2;
-  if (progress > 100) progress = 100;
-
-  bar.style.width = progress + "%";
-  statusText.innerHTML = "Scanning system files... " + progress + "%";
-
-  if (progress > 35 && progress < 60) {
-    warning.innerHTML = "⚠️ Threat detected: " +
-      viruses[Math.floor(Math.random() * viruses.length)];
-    document.body.style.background =
-      progress % 2 === 0 ? "#200" : "black";
-    panic += 2;
-  }
-
-  if (progress >= 60 && progress < 90) {
-    statusText.innerHTML = "Deleting infected files...";
-    deletedFiles += Math.floor(Math.random() * 5) + 1;
-    filesText.innerHTML = "🗑 Files deleted: " + deletedFiles;
-    panic += 3;
-  }
-
-  panicText.innerHTML = "😱 Panic level: " + panic + "%";
-
-  if (progress >= 100) {
-    clearInterval(scan);
-    warning.innerHTML = "🚨 SYSTEM FAILURE!";
-    statusText.innerHTML = "Critical error detected...";
-    setTimeout(showBlueScreen, 1500);
-  }
-
-}, 200);
-
-function showBlueScreen() {
-  main.style.display = "none";
-  blue.style.display = "block";
-
-  let time = 5;
-  document.getElementById("countdown").innerHTML =
-    "Restarting in " + time + " seconds...";
-
-  let timer = setInterval(() => {
-    time--;
-    document.getElementById("countdown").innerHTML =
-      "Restarting in " + time + " seconds...";
-
-    if (time === 0) {
-      clearInterval(timer);
-      prankReveal();
-    }
-  }, 1000);
-}
-
-function prankReveal() {
-  alert(
-    "😂 GOT YOU!\n\nFake virus prank 😈\n\nComment:\n'I PANICKED 😱'\n\nRedirecting you..."
-  );
-
-  setTimeout(() => {
-    window.location.href = channelLink;
-  }, 1500);
-}
-
-</script>
-
+        // 5. Alerte avant de quitter l'onglet
+        window.onbeforeunload = function() {
+            return "Voulez-vous vraiment quitter cette expérience ?";
+        };
+    </script>
 </body>
 </html>
