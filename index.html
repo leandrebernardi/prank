@@ -2,83 +2,98 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chargement en cours...</title>
+    <title>Système Infecté</title>
     <style>
-        /* Supprime les marges et empêche le scroll */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            cursor: default;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; color: white; font-family: sans-serif; }
+        
+        /* Centrage de tous les messages */
+        .scene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; text-align: center; }
 
-        /* La vidéo prend tout l'espace disponible sans déformation */
-        video {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            pointer-events: none; /* Empêche l'utilisateur de cliquer sur pause */
-        }
+        /* ÉCRAN DE DÉPART (Indispensable) */
+        #start-screen { display: flex; flex-direction: column; background: darkred; cursor: pointer; z-index: 100; }
+        #start-screen h1 { font-size: 50px; }
 
-        /* Message invisible au centre pour forcer l'interaction si besoin */
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-        }
+        /* PHASE 1 : VIRUS (Texte vert géant) */
+        #scene-virus { background: black; color: #0f0; flex-direction: column; }
+        #scene-virus h2 { font-size: 80px; text-shadow: 0 0 20px #0f0; }
+
+        /* PHASE 2 : BSOD (L'écran bleu Windows) */
+        #scene-bsod { background-color: #0078d7; color: white; flex-direction: column; align-items: flex-start; text-align: left; padding: 10%; }
+        .sad-face { font-size: 120px; }
+        .bsod-text { font-size: 30px; margin-top: 20px; line-height: 1.4; }
+
+        /* PHASE 3 : ÉCRAN NOIR */
+        #scene-black { background: black; }
     </style>
 </head>
 <body>
 
-    <div id="overlay"></div>
+    <div id="start-screen" class="scene">
+        <h1>⚠️ ERREUR FATALE DÉTECTÉE</h1>
+        <p>Cliquez ici pour tenter une réparation du disque (C:)</p>
+    </div>
 
-    <video id="prankVideo" loop playsinline>
-        <source src="votre-video.mp4" type="video/mp4">
-        You have been hacked !!
-    </video>
+    <div id="scene-virus" class="scene">
+        <h2>VIRUS INJECTÉ...</h2>
+        <p style="font-size: 30px;">Extraction des mots de passe : 88%</p>
+        <p style="font-size: 20px; color: #555;">IP: 192.168.1.104 | Uploading to server...</p>
+    </div>
+
+    <div id="scene-bsod" class="scene">
+        <div class="sad-face">:(</div>
+        <div class="bsod-text">
+            Your PC ran into a problem and needs to restart. We're just collecting some error info, and then we'll restart for you.<br><br>
+            <span id="progress">0% complete</span>
+        </div>
+    </div>
+
+    <div id="scene-black" class="scene"></div>
 
     <script>
-        const video = document.getElementById('prankVideo');
-        const overlay = document.getElementById('overlay');
+        // --- RÉGLAGES DES DURÉES (en millisecondes) ---
+        const TEMPS_VIRUS = 5000; // 5 secondes de texte vert
+        const TEMPS_BSOD  = 8000; // 8 secondes d'écran bleu
 
-        // 1. Démarrage de la vidéo et Plein Écran au premier clic
-        overlay.addEventListener('click', () => {
-            video.play();
-            overlay.style.display = 'none'; // On cache l'overlay une fois cliqué
+        const start = document.getElementById('start-screen');
+        const s1 = document.getElementById('scene-virus');
+        const s2 = document.getElementById('scene-bsod');
+        const s3 = document.getElementById('scene-black');
+        const prog = document.getElementById('progress');
+
+        // Lancement au clic
+        start.addEventListener('click', () => {
+            start.style.display = 'none';
+            s1.style.display = 'flex'; // Affiche le virus
             
-            // Tentative de plein écran
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
+            // Plein écran automatique
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+
+            // Vers l'écran bleu
+            setTimeout(() => {
+                s1.style.display = 'none';
+                s2.style.display = 'flex';
+                
+                // Simulation du pourcentage
+                let p = 0;
+                let interval = setInterval(() => {
+                    p += Math.floor(Math.random() * 10);
+                    if (p > 100) p = 100;
+                    prog.innerText = p + "% complete";
+                    if (p >= 100) clearInterval(interval);
+                }, 500);
+
+            }, TEMPS_VIRUS);
+
+            // Vers l'écran noir final
+            setTimeout(() => {
+                s2.style.display = 'none';
+                s3.style.display = 'flex';
+                document.body.style.cursor = 'none'; // Cache la souris
+            }, TEMPS_VIRUS + TEMPS_BSOD);
         });
 
-        // 2. Blocage du menu contextuel (clic droit)
+        // Anti clic droit
         document.addEventListener('contextmenu', e => e.preventDefault());
-
-        // 3. Empêcher la mise en pause (si l'utilisateur trouve une astuce)
-        video.onpause = () => video.play();
-
-        // 4. Titre de l'onglet dynamique (Psychologique)
-        let titles = ["⚠️ ERREUR SYSTÈME", "Chargement 99%...", "Ne pas fermer !", "Ceci est un message de l'équipe de votre PC."];
-        let i = 0;
-        setInterval(() => {
-            document.title = titles[i % titles.length];
-            i++;
-        }, 1000);
-
-        // 5. Alerte avant de quitter l'onglet
-        window.onbeforeunload = function() {
-            return "Voulez-vous vraiment quitter cette expérience ?";
-        };
     </script>
 </body>
 </html>
